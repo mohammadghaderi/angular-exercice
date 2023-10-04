@@ -1,35 +1,31 @@
-import { Component, Input } from '@angular/core';
-import { StudentStore } from 'src/app/data-access/student.store';
-import { TeacherStore } from 'src/app/data-access/teacher.store';
-import { CardType } from 'src/app/model/card.model';
+import { NgTemplateOutlet } from '@angular/common';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, } from '@angular/core';
 
 @Component({
   selector: 'app-list-item',
   template: `
     <div class="border border-grey-300 py-1 px-2 flex justify-between">
-      {{ name }}
+    <ng-content select="name"></ng-content>
       <button (click)="delete(id)">
         <img class="h-5" src="assets/svg/trash.svg" />
       </button>
     </div>
   `,
   standalone: true,
+  changeDetection:ChangeDetectionStrategy.OnPush,
+  imports:[NgTemplateOutlet]
+
 })
 export class ListItemComponent {
   @Input() id!: number;
-  @Input() name!: string;
-  @Input() type!: CardType;
+  @Output () deleteItem: EventEmitter<number> = new EventEmitter();
+  @Input() name!:string;
 
   constructor(
-    private teacherStore: TeacherStore,
-    private studentStore: StudentStore
-  ) {}
+  ) {
+  }
 
   delete(id: number) {
-    if (this.type === CardType.TEACHER) {
-      this.teacherStore.deleteOne(id);
-    } else if (this.type === CardType.STUDENT) {
-      this.studentStore.deleteOne(id);
-    }
+    this.deleteItem.emit(id);
   }
 }

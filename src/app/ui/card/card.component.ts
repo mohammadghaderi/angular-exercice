@@ -1,11 +1,5 @@
-import { NgFor, NgIf } from '@angular/common';
-import { Component, Input, OnInit } from '@angular/core';
-import {
-  randStudent,
-  randTeacher,
-} from 'src/app/data-access/fake-http.service';
-import { StudentStore } from 'src/app/data-access/student.store';
-import { TeacherStore } from 'src/app/data-access/teacher.store';
+import { CommonModule, NgFor } from '@angular/common';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output, TemplateRef } from '@angular/core';
 import { CardType } from 'src/app/model/card.model';
 import { ListItemComponent } from '../list-item/list-item.component';
 
@@ -13,27 +7,34 @@ import { ListItemComponent } from '../list-item/list-item.component';
   selector: 'app-card',
   templateUrl: './card.component.html',
   standalone: true,
-  imports: [NgIf, NgFor, ListItemComponent],
+  imports: [ NgFor, ListItemComponent,CommonModule],
+  changeDetection:ChangeDetectionStrategy.OnPush,
+  styles:[
+    `
+     .bg-light-green {
+        background-color: rgba(0, 250, 0, 0.1);
+      }
+      .bg-light-red {
+        background-color: rgba(250, 0, 0, 0.1);
+      }
+      .bg-light-blue {
+        background-color: rgba(0, 0, 255, 0.1);
+      }
+    `
+  ]
+
 })
 export class CardComponent implements OnInit {
   @Input() list: any[] | null = null;
   @Input() type!: CardType;
   @Input() customClass = '';
-
+  @Output() deleteItem = new EventEmitter();
+  @Input('listTemplate') listTemplate!:TemplateRef<any>;
   CardType = CardType;
 
-  constructor(
-    private teacherStore: TeacherStore,
-    private studentStore: StudentStore
-  ) {}
+  constructor() {
+  }
+  
 
   ngOnInit(): void {}
-
-  addNewItem() {
-    if (this.type === CardType.TEACHER) {
-      this.teacherStore.addOne(randTeacher());
-    } else if (this.type === CardType.STUDENT) {
-      this.studentStore.addOne(randStudent());
-    }
-  }
 }
